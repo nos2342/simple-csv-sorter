@@ -14,3 +14,4 @@ When running, make sure your active directory contains the CSV file you're sorti
 
 * Command-line options for selecting a different CSV file from the default that is hardcoded in.
 * Output to a CSV format instead of the command-line.
+* Change the language used within for more general use than stock data

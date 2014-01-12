@@ -19,7 +19,7 @@ public class Run {
 	private final static int ATTRIBUTES = 27;
 	private final static int NUM_HEADERS = ATTRIBUTES + 1;
 	private final static int EXIT = -3, REVERSE = -2, HELP = -1;
-	private final static String FILENAME = "Co. screener US stocks.csv";
+	private final static String FILENAME = "example-data.csv";
 	private final static String PATH = System.getProperty("user.dir")
 	    + File.separator + FILENAME;
 	private final static String[] COMMANDS =
