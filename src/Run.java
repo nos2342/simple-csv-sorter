@@ -16,118 +16,128 @@ import java.util.Stack;
  */
 
 public class Run {
-	private final static int ATTRIBUTES = 27;
-	private final static int NUM_HEADERS = ATTRIBUTES + 1;
-	private final static int EXIT = -3, REVERSE = -2, HELP = -1;
+	private final static int EXIT = -3, REVERSE = -2, SAVE = -1;
 	private final static String FILENAME = "example-data.csv";
 	private final static String PATH = System.getProperty("user.dir")
 	    + File.separator + FILENAME;
-	private final static String[] COMMANDS =
-	/*
-	 * These are the miscellaneous commands. If you're adding new ones, remember
-	 * to handle them in the switch statement in main
-	 */
-	{ "exit", "reverse", "help",
-	/*
-	 * These commands each sort the data by the corresponding attribute. Feel free
-	 * to modify the commands here. If you're adding new attributes to sort,
-	 * though, remember to increase ATTRIBUTES
-	 */
-	"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14",
-	    "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26",
-	    "27" };
-	private static String[] HEADERS = new String[NUM_HEADERS];
+	private final static String MENU = 
+	"To sort the table, enter the column number you'd like to sort by.\n\n" +
+	"To reverse the order, enter -2.\n\n" +
+	"To save the new CSV, enter -1.\n\n" +
+	"To exit, enter -3.\n";
+	private final static String PROMPT = ">";
 	
-	/**
+	private static int NUM_VALUES;
+	private static int NUM_HEADERS;
+	private static Object[] HEADERS;
+	private static LinkedList<Row> data;
+	
+  /**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		File csv = new File(FILENAME);
-		Scanner fileReader = null;
 		System.out.println(csv.getPath());
 		try{
-			fileReader = new Scanner(csv);
+			Scanner fileReader = new Scanner(csv);
 			fileReader.useDelimiter(",|\r|\n"); // separate by commas and new lines
+			// first we get our headers
+		  getHeaders(fileReader.nextLine());
+		
+		  // now we assemble our data.
+		  assembleData(fileReader);
 		}catch (FileNotFoundException e){
-			System.out.println("Failed to access " + PATH);
+			System.out.println("Failed to find " + PATH);
 			System.exit(1);
 		}
 		
-		// first we get our headers
-		for (int i = 0; i < NUM_HEADERS && fileReader.hasNext(); i++)
-			HEADERS[i] = fileReader.next();
-		
-		// now we assemble our data. It will always be stored in this list.
-		LinkedList<Business> data = new LinkedList<Business>();
-		while (fileReader.hasNext()){
-			String name = fileReader.next();
-			BigDecimal[] attributes = new BigDecimal[ATTRIBUTES];
-			for (int i = 0; i < attributes.length; i++){
-				try{
-					attributes[i] = fileReader.nextBigDecimal();
-				}catch (InputMismatchException e){
-					attributes[i] = null;
-				}
-			}
-			data.add(new Business(name, attributes));
-		}
-		
-		/*
-		 * Here we set up a map from commands to integers, by which we can identify
-		 * them
-		 */
-		HashMap<String, Integer> commandMap = new HashMap<String, Integer>();
-		int commandInt = ATTRIBUTES - COMMANDS.length;
-		for (String command : COMMANDS)
-			commandMap.put(command, commandInt++);
-		
-		// Finally, we can get some input
-		Scanner input = new Scanner(System.in);
-		
-		// this loop condition only fails when an End Of File (EOF) is entered
-		while (input.hasNext()){
-			String command = input.next();
-			Integer index = commandMap.get(command);
-			if (index == null){
-				System.out.println();
-			}else if (index < 0){
-				switch (index) {
-					case EXIT:// exit
-						System.exit(0);
-					case REVERSE:// reverse
-						data = reverse(data);
-						printData(data);
-						break;
-					case HELP:// help TODO
-						help();
-						break;
-					default:
-						System.out.println("Something has gone very wrong, possibly in "
-								+ "the command structure.");
-						break;
-				}
-			}else{
-				data = heapSort(index, data);
-				printData(data);
-			}
-		}
+		//finally, we are ready to accept commands
+		displayMenu();
 		
 	}
 	
 	/*
-	 * A helper method for sorting a data set via heapsort. This is an O(NlogN)
-	 * (linearithmic) algorithm.
+	 * 
 	 */
-	private static LinkedList<Business>
-	    heapSort(int n, Collection<Business> data) {
-		PriorityQueue<Business> aHeap = new PriorityQueue<Business>(data.size()
-		/* ,new BusinessComparator<Business>(n) */);
-		for (Business b : data){
-			b.setActive(n);
+	private static void getHeaders(String s) {//TODO
+	  Scanner headHunter = new Scanner(s);
+	  headHunter.useDelimiter(",");
+	  LinkedList<String> headerlist = new LinkedList<String>();
+	  while (headHunter.hasNext()){
+	    headerlist.add(headHunter.next());
+	  }
+	  HEADERS = headerlist.toArray(new String[0]);
+	  NUM_HEADERS = HEADERS.length;
+	  NUM_VALUES = NUM_HEADERS - 1;
+	}
+	
+	/*
+	 * 
+	 */
+	private static LinkedList<Row> assembleData(Scanner fileReader){//TODO
+	  data = new LinkedList<Row>();
+		while (fileReader.hasNext()){
+			String key = fileReader.next();
+			BigDecimal[] values = new BigDecimal[NUM_VALUES];
+			for (int i = 0; i < values.length; i++){
+				try{
+					values[i] = fileReader.nextBigDecimal();
+				}catch (InputMismatchException e){
+					values[i] = null;
+				}
+			}
+			data.add(new Row(key, values));
+		}
+	  return null;
+	}
+	
+	/*
+	 * 
+	 */
+	private static void displayMenu(){
+	  //TODO implement real commands e.g. "exit" "sort 1"
+		System.out.println(MENU);
+		while (true){
+		  System.out.print(PROMPT);
+		  Scanner input = new Scanner(System.in);
+			try {
+			  Integer index = input.nextInt();
+			  switch (index) {
+				  case EXIT:// exit
+					  System.exit(0);
+				  case REVERSE:// reverse
+					  data = reverse();
+					  printData();
+					  break;
+			    case SAVE://save
+			      save();
+			      break;
+				  default:
+					  if (index > NUM_HEADERS || index < EXIT){
+		          System.out.println("Invalid input: " + index);
+		        } else{
+					    data = heapSort(index);
+					    printData();
+					  }
+			  }
+		  } catch (InputMismatchException e) {
+		    System.out.println("Invalid input.");
+		  }
+		}
+	}
+	
+	/*
+	 * A helper method for sorting a data set via heapsort. This is a linearithmic
+	 * algorithm.
+	 */
+	private static LinkedList<Row> heapSort(int n) {
+		PriorityQueue<Row> aHeap = new PriorityQueue<Row>(data.size());
+		for (Row b : data){
+			b.selectColumn(n);
 			aHeap.offer(b);
 		}
 		
-		LinkedList<Business> newData = new LinkedList<Business>();
+		LinkedList<Row> newData = new LinkedList<Row>();
 		while (!aHeap.isEmpty())
 			newData.add(aHeap.poll());
 		return newData;
@@ -137,25 +147,24 @@ public class Run {
 	 * A helper method for reversing the order of a sorted dataset. This is a
 	 * linear algorithm.
 	 */
-	private static LinkedList<Business> reverse(Collection<Business> data) {
-		Stack<Business> aStack = new Stack<Business>();
+	private static LinkedList<Row> reverse() {
+		Stack<Row> aStack = new Stack<Row>();
 		
 		// push all the data to the stack...
-		for (Business b : data)
+		for (Row b : data)
 			aStack.push(b);
 		
 		// ... and pop it all off again.
-		LinkedList<Business> newData = new LinkedList<Business>();
+		LinkedList<Row> newData = new LinkedList<Row>();
 		while (!aStack.isEmpty())
 			newData.add(aStack.pop());
 		return newData;
 	}
 	
 	/*
-	 * A poorly conceived but well-meaning idea for a command. It wasn't a
-	 * priority, and was cut last minute.
+	 * 
 	 */
-	private static void help() {// TODO
+	private static void help() {// TODO make this a command-line option, -h
 	
 	}
 	
@@ -163,12 +172,23 @@ public class Run {
 	 * A helper method for printing data to output. Can be easily modified to
 	 * print to a file instead.
 	 * 
-	 * Currently, the method skips Businesses with null active values.
+	 * Currently, the method skips Rows with null active values.
 	 */
-	private static void printData(LinkedList<Business> data) {
-		System.out.println("Ticker\t" + HEADERS[data.peek().active + 1]);
-		for (Business b : data)
-			if (b.getActive() != null)
+	private static void printData() {
+	  int activeColumn = data.peek().getActiveColumn();
+	  if(activeColumn == 0){
+	    System.out.println(HEADERS[activeColumn]);
+	  }
+		System.out.print("Ticker\t" + HEADERS[data.peek().getActiveColumn() + 1]);
+		for (Row b : data)
+			if (b.activeValue() != null)
 				System.out.println(b);
+	}
+	
+	/*
+	 * 
+	 */
+	private static boolean save(){//TODO save data as a CSV file
+	  return false;
 	}
 }

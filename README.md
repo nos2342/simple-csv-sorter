@@ -12,6 +12,10 @@ When running, make sure your active directory contains the CSV file you're sorti
 
 ###Future Plans
 
-* Command-line options for selecting a different CSV file from the default that is hardcoded in.
-* Output to a CSV format instead of the command-line.
-* Change the language used within for more general use than stock data
+ * Command-line options
+ * Replace hardcoded file name with command-line args and/or prompt
+ * Output to a CSV format instead of the command-line.
+ * Create a responsive and pleasant keyboard-input menu
+ * Generalize to other sorts of CSV files
+  * ~~Generalize internal terminology~~
+  * Generalize accepted values
