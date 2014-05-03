@@ -1,7 +1,7 @@
 import java.math.BigDecimal;
 
 /**
- * @author Matthew Hausman
+ * @author Maura Hausman
  */
 public class Row implements Comparable<Row>{
 	BigDecimal[] values;

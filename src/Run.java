@@ -10,9 +10,11 @@ import java.util.Scanner;
 import java.util.Stack;
 
 /**
- * Run The main class.
+ * Run 
+ *
+ * The main class.
  * 
- * @author Matthew Hausman
+ * @author Maura Hausman
  */
 
 public class Run {
@@ -179,7 +181,7 @@ public class Run {
 	  if(activeColumn == 0){
 	    System.out.println(HEADERS[activeColumn]);
 	  }
-		System.out.print("Ticker\t" + HEADERS[data.peek().getActiveColumn() + 1]);
+		System.out.print("Ticker\t" + HEADERS[activeColumn + 1]);
 		for (Row b : data)
 			if (b.activeValue() != null)
 				System.out.println(b);
